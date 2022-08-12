@@ -4,9 +4,9 @@ import java.util.List;
 
 public class Comment extends Timestamped{
 
-    Long commentId;
-    String content;
-    Member member;
-    List<Post> postList;
-    List<Comment> commentList;
+    private Long commentId;
+    private String content;
+    private Member member;
+    private List<Post> postList;
+    private List<Comment> commentList;
 }

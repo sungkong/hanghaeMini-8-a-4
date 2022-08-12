@@ -2,10 +2,10 @@ package hanghae8mini.booglogbackend.domain;
 
 public class Member extends Timestamped{
 
-    Long memberId;
-    String account;
-    String password;
-    String nickname;
-    String imageUrl;
+    private Long memberId;
+    private String account;
+    private String password;
+    private String nickname;
+    private String imageUrl;
 
 }
