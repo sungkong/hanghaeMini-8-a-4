@@ -34,12 +34,15 @@ public class Post extends Timestamped {
     @Column(nullable = true)
     private String imageUrl;
 
-    @Column(nullable = true)
-    private List<Comment> commentList;
+    /*@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> commentList;*/
 
-    @Column(nullable = true)
+    @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
+
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private Category category;
 }
