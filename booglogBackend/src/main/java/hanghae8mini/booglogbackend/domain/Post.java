@@ -34,6 +34,9 @@ public class Post extends Timestamped {
     @Column(nullable = true)
     private String imageUrl;
 
+    @Column(columnDefinition = "integer default 0", nullable = false)
+    private int view; //조회수
+
     /*@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList;*/
 

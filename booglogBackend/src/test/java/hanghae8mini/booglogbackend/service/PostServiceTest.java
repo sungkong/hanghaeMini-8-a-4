@@ -4,6 +4,7 @@ import hanghae8mini.booglogbackend.domain.Post;
 import hanghae8mini.booglogbackend.dto.request.PostRequestDto;
 import hanghae8mini.booglogbackend.dto.response.PostResponseDto;
 import hanghae8mini.booglogbackend.dto.response.ResponseDto;
+import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.repository.PostRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,22 +13,30 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class PostServiceTest {
 
-    @InjectMocks
-    private PostService postService;
+//    @InjectMocks
+//    private PostService postService;
+//    @Mock
+//    private PostRepository postRepository;
+//    @Mock
+//    private MemberRepository memberRepository;
 
-    @Mock
-    private PostRepository postRepository;
+    @Autowired
+    private PostService postService;
 
     @Test
     @DisplayName("게시글 작성")
@@ -55,8 +64,14 @@ class PostServiceTest {
     @DisplayName("메인페이지 조회")
     void getAllPost(){
 
+        // given
+
+        //when
         List<PostResponseDto> list = (java.util.List<PostResponseDto>) postService.getAllPost(5l,3).getData();
         System.out.println(list);
+
+        //then
+        assertThat(list.size()).isEqualTo(3);
     }
 
 }

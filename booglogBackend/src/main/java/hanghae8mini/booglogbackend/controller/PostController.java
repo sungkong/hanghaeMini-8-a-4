@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,9 +22,18 @@ public class PostController {
                                      HttpServletRequest request) {
         return postService.createPost(requestDto, request);
     }
-    // 게시글 상세조회 + 수정 페이지 불러오기
+    // 게시글 상세조회
     @GetMapping(value = "/api/post/{postId}")
-    public ResponseDto<?> createPost(@PathVariable Long postId) {
+    public ResponseDto<?> createPost(@PathVariable Long postId,
+                                     HttpServletRequest request,
+                                     HttpServletResponse response) {
+        postService.updateView(postId, request, response); // 조회수 증가
+        return postService.getPost(postId);
+    }
+
+    // 수정 페이지 불러오기
+    @GetMapping(value = "/api/updatePostPage/{postId}")
+    public ResponseDto<?> getUpdatePostPage(@PathVariable Long postId) {
         return postService.getPost(postId);
     }
 

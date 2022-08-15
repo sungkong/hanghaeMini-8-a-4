@@ -23,6 +23,7 @@ public class PostResponseDto {
     private String imageUrl;
     private Category category;
     private LocalDateTime createdAt;
+    private int view;
 
     // private List<CommentResponseDto> commentResponseDtoList;
 
@@ -37,6 +38,7 @@ public class PostResponseDto {
                 ", author='" + author + '\'' +
                 ", nickname='" + nickname + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", view='" + view + '\'' +
                 ", category='" + category + '\'' +
                 ", createdAt=" + createdAt +
                 '}';
