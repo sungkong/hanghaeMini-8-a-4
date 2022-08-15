@@ -16,7 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByOrderByModifiedAtDesc();
 
     // 비로그인 메인페이지 조회
-    @Query(value = "select distinct * from post order by rand() limit :size", nativeQuery = true)
+    @Query(value = "select * from post order by view desc limit :size", nativeQuery = true)
     public List<Post> PostAllRandom(@Param(value = "size") int size);
 
     @Query(value ="SELECT distinct * " +
@@ -28,7 +28,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "                      on p.member_member_id = m.member_id " +
             "        where m.member_id = :memberId" +
             "    ) " +
-            " limit :size offset :lastPostId ", nativeQuery = true)
+            "ORDER BY view desc " +
+            "limit :size offset :lastPostId ", nativeQuery = true)
     public List<Post> findAllByMemberIdAndCategory(@Param(value = "memberId") Long memberId,
                                               @Param(value = "lastPostId") Long lastPostId,
                                               @Param(value = "size") int size);

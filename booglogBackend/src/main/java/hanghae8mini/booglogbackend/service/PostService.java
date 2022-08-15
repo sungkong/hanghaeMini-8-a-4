@@ -74,7 +74,8 @@ public class PostService {
     public ResponseDto<?> getPost(Long postId) {
 
         // 테스트용
-        Member member = validationMemberById(1l);
+        //Member member = validationMemberById(1l);
+        Member member = validationMemberById(2l);
 
         Post post = checkMemberUtil.isPresentPost(postId);
 
@@ -119,14 +120,18 @@ public class PostService {
 
         // 테스트용
         //
-        Member member = validationMemberById(1l);
-        //Member member = null;
+        //Member member = validationMemberById(1l);
+        Member member = null;
 
 
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         List<Post> postList = new ArrayList<>();
         // 비로그인 로직
         if (member == null) {
+            List<Post> temp = new ArrayList<>();
+            temp = postRepository.PostAllRandom(size);
+
+
             postList = postRepository.PostAllRandom(size);
         } else { // 로그인 로직
             postList = postRepository.findAllByMemberIdAndCategory(1l, lastPostId, size);
