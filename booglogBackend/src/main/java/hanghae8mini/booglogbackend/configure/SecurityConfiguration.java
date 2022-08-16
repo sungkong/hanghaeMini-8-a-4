@@ -74,7 +74,7 @@ public class SecurityConfiguration {
     }
 
     
-    //CORS ㄱ설정
+    //CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

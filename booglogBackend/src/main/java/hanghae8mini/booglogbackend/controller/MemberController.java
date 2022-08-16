@@ -1,5 +1,6 @@
 package hanghae8mini.booglogbackend.controller;
 
+import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.LoginRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
 
@@ -28,23 +29,23 @@ public class MemberController {
     private final S3Service s3Service;
 
     // 회원가입 & 프로필사진 업로드
-    @RequestMapping(value = "/api/image", method = RequestMethod.POST)
-    public String uploadProfileImg(@RequestPart(required = false, value = "file") MultipartFile multipartFile) throws IOException {
-        return s3Service.uploadFile(multipartFile);
-    }
-
-    //    @RequestMapping(value = "/api/user/signup", method = RequestMethod.POST)
-//    public ResponseDto<?> signup(@RequestBody @Valid MemberRequestDto requestDto,
-//                                 @RequestPart(required = false, value = "file") MultipartFile multipartFile) {
-//        return memberService.createMember(requestDto);
+//    @PostMapping(value = "/image")
+//    public String uploadProfileImg(@RequestPart(required = false, value = "file") MultipartFile multipartFile) throws IOException {
+//        return s3Service.uploadFile(multipartFile);
 //    }
 
-
-    //회원가입
-    @PostMapping("/signup") //테스트 ok
-    public ResponseDto<?> signUp(@RequestBody @Valid MemberRequestDto requestDto) {
-        return memberService.signUp(requestDto);
+    //회원가입 (사진 동시 등록 버전)
+    @PostMapping(value = "/signup")
+    public ResponseDto<?> signup(@RequestPart(value = "dto") @Valid MemberRequestDto requestDto,
+                                 @RequestPart(required = false, value = "file") MultipartFile multipartFile) throws IOException {
+        return memberService.signUp(requestDto, multipartFile);
     }
+
+//    //회원가입
+//    @PostMapping("/signup") //테스트 ok
+//    public ResponseDto<?> signUp(@RequestBody @Valid MemberRequestDto requestDto) {
+//        return memberService.signUp(requestDto);
+//    }
 
     //로그인
     @PostMapping("/login") //테스트 ok

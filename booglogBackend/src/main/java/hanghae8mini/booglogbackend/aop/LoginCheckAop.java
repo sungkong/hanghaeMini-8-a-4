@@ -1,5 +1,8 @@
 package hanghae8mini.booglogbackend.aop;
 
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
+import hanghae8mini.booglogbackend.domain.Member;
+import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -14,7 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 @Component
 public class LoginCheckAop {
-/*
 
     private final TokenProvider tokenProvider;
 
@@ -46,7 +48,4 @@ public class LoginCheckAop {
         }
         return tokenProvider.getMemberFromAuthentication();
     }
-*/
-
-
 }

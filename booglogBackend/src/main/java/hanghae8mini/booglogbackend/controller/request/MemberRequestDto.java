@@ -35,7 +35,7 @@ public class MemberRequestDto {
     @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "영문 대/소 문자 및 숫자만 사용")
     private String passwordCheck;
 
-    private String imageUrl;
+//    private String imageUrl;
 
 
 }

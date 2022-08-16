@@ -1,6 +1,7 @@
 package hanghae8mini.booglogbackend.service;
 
 
+import hanghae8mini.booglogbackend.annotation.LoginCheck;
 import hanghae8mini.booglogbackend.controller.response.CommentResponseDto;
 import hanghae8mini.booglogbackend.domain.Category;
 import hanghae8mini.booglogbackend.domain.Comment;
@@ -34,22 +35,22 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final CheckMemberUtil checkMemberUtil;
-    // private final PostCustomRepository postCustomRepository;
+
+    private final PostCustomRepository postCustomRepository;
     private final CommentRepository commentRepository;
 
     private final static String VIEWCOOKIENAME = "alreadyViewCookie";
 
+    @LoginCheck
     @Transactional
     public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
 
-        // Member member = checkMemberUtil.validateMember(request);
+//        Member member = checkMemberUtil.validateMember(request);
+//
+//        if (null == member) {
+//            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+//        }
 
-        /*if (null == member) {
-            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-        }*/
-
-        // 테스트용
-        Member member = validationMemberById(1l);
 
         Category categoryEnum = null;
         try{
@@ -63,7 +64,7 @@ public class PostService {
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
                 .imageUrl(requestDto.getImageUrl())
-                .member(member)
+//                .member(member)
                 .category(categoryEnum)
                 .author(requestDto.getAuthor())
                 .build();

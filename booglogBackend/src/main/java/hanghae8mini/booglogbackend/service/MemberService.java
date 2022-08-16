@@ -1,23 +1,31 @@
 package hanghae8mini.booglogbackend.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import hanghae8mini.booglogbackend.controller.requestDto.LoginRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.TokenDto;
 import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.controller.responseDto.MemberResponseDto;
+import hanghae8mini.booglogbackend.shared.CommonUtils;
 import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -32,8 +40,39 @@ public class MemberService {
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+
+    private final String cloudFrontDomain = "https://d1ig9s8koiuspp.cloudfront.net/";
+
+//    @Transactional
+//    public ResponseDto<?> signUp(MemberRequestDto requestDto) { //회원가입
+//        if (null != isPresentAccount(requestDto.getAccount())) {
+//            return ResponseDto.fail("DUPLICATED_ACCOUNT",
+//                    "중복된 아이디 입니다.");
+//        }
+//        if (!requestDto.getPassword().equals(requestDto.getPasswordCheck())) {
+//            return ResponseDto.fail("PASSWORDS_NOT_MATCHED",
+//                    "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+//        }
+//
+//        Member member = Member.builder()
+//                .account(requestDto.getAccount())
+//                .password(passwordEncoder.encode(requestDto.getPassword())) //복호화 저장
+//                .nickname(requestDto.getNickname())
+//                .imageUrl(requestDto.getImageUrl())
+//                .build();
+//        memberRepository.save(member);
+//        return ResponseDto.success("회원가입 성공");
+//    }
+
+    // 회원가입 (사진 동시 등록 버전)
     @Transactional
-    public ResponseDto<?> signUp(MemberRequestDto requestDto) { //회원가입
+    public ResponseDto<?> signUp(MemberRequestDto requestDto, MultipartFile multipartFile) throws IOException { //회원가입
+        System.out.println(requestDto.getAccount());
+
         if (null != isPresentAccount(requestDto.getAccount())) {
             return ResponseDto.fail("DUPLICATED_ACCOUNT",
                     "중복된 아이디 입니다.");
@@ -43,11 +82,24 @@ public class MemberService {
                     "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
         }
 
+        String imgUrl = null;
+
+        if (!multipartFile.isEmpty()) {
+            String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(multipartFile.getContentType());
+            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, multipartFile.getInputStream(), objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            imgUrl = amazonS3Client.getUrl(bucketName, fileName).toString();
+            String[] nameWithNoS3info = imgUrl.split(".com/");
+            imgUrl = nameWithNoS3info[1];
+        }
+
         Member member = Member.builder()
                 .account(requestDto.getAccount())
                 .password(passwordEncoder.encode(requestDto.getPassword())) //복호화 저장
                 .nickname(requestDto.getNickname())
-                .imageUrl(requestDto.getImageUrl())
+                .imageUrl(imgUrl)
                 .build();
         memberRepository.save(member);
         return ResponseDto.success("회원가입 성공");

@@ -1,8 +1,11 @@
 package hanghae8mini.booglogbackend.util;
 
 import hanghae8mini.booglogbackend.domain.Comment;
+import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.domain.Post;
+import hanghae8mini.booglogbackend.repository.CommentRepository;
 import hanghae8mini.booglogbackend.repository.PostRepository;
+import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,8 +18,8 @@ import java.util.Optional;
 public class CheckMemberUtil {
 
     private final PostRepository postRepository;
-//    private final TokenProvider tokenProvider;
-//    private final CommentRepository commentRepository;
+    private final TokenProvider tokenProvider;
+    private final CommentRepository commentRepository;
 
     @Transactional(readOnly = true)
     public Post isPresentPost(Long id) {
@@ -24,7 +27,7 @@ public class CheckMemberUtil {
         return optionalPost.orElse(null);
     }
 
-   /* @Transactional(readOnly = true)
+   @Transactional(readOnly = true)
     public Member validateMember(HttpServletRequest request) {
         if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
             return null;
@@ -36,6 +39,6 @@ public class CheckMemberUtil {
     public Comment isPresentComment(Long id) {
         Optional<Comment> optionalComment = commentRepository.findById(id);
         return optionalComment.orElse(null);
-    }*/
+    }
 
 }

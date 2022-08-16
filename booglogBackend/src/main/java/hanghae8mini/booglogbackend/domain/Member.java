@@ -22,22 +22,22 @@ public class Member extends Timestamped {
     private Long memberId;
 
     @Column(nullable = false)
-    private String account;
+    private String account;  // 로그인 아이디
 
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
-    private String nickname;
+    private String nickname;  // 서비스 내 사용하는 닉네임
 
-    @Column(nullable = true)
+    @Column
     private String imageUrl;
 
-    public Member(MemberRequestDto requestDto) {
+    public Member(MemberRequestDto requestDto, String imageUrl) {
         this.account = requestDto.getAccount();
         this.password = requestDto.getPassword();
         this.nickname = requestDto.getNickname();
-        this.imageUrl = requestDto.getImageUrl();
+        this.imageUrl = imageUrl;
     }
 
 
