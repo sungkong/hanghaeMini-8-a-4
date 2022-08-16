@@ -46,17 +46,20 @@ public class SpringConfig {
         return new MappingJackson2HttpMessageConverter(copy);
     }
 
-
-    //CORS설정. 프론트랑 합칠 때 사용하기.
-//    @Bean
-//    public WebMvcConfigurer corsConfigurer() {
-//        return new WebMvcConfigurer() {
-//            @Override
-//            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/myApi").allowedOrigins("https://from.com");
-//                //.allowCredentials(true) // 필요한 경우
-//            }
-//        };
-//    }
+   /* //CORS설정. 프론트랑 합칠 때 사용하기.
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/*")
+                        .allowedOrigins("https://localhost:3000")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("headers")
+                        .maxAge(3600); // 3600초동안 preflight 캐시에 저장
+                //.allowCredentials(true) // 필요한 경우
+            }
+        };
+    }*/
 
 }

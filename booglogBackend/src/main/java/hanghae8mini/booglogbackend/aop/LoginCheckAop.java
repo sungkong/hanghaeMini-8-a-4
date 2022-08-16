@@ -18,7 +18,7 @@ public class LoginCheckAop {
 
     private final TokenProvider tokenProvider;
 
-    @Before("@annotation(com.example.intermediate.annotation.LoginCheck)")
+    @Before("@annotation(hanghae8mini.booglogbackend.annotation.LoginCheck)")
     public ResponseDto<?> loginCheck(){
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
