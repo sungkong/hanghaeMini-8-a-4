@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginCheckAop {
 /*
 
+//
     private final TokenProvider tokenProvider;
 
     @Before("@annotation(hanghae8mini.booglogbackend.annotation.LoginCheck)")
