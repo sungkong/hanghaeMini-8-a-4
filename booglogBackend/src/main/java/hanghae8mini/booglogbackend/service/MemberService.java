@@ -1,0 +1,129 @@
+package hanghae8mini.booglogbackend.service;
+
+import hanghae8mini.booglogbackend.controller.requestDto.LoginRequestDto;
+import hanghae8mini.booglogbackend.controller.requestDto.TokenDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
+import hanghae8mini.booglogbackend.controller.responseDto.MemberResponseDto;
+import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
+import hanghae8mini.booglogbackend.domain.Member;
+import hanghae8mini.booglogbackend.repository.MemberRepository;
+import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@Service
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final TokenProvider tokenProvider;
+
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+
+    @Transactional
+    public ResponseDto<?> signUp(MemberRequestDto requestDto) { //회원가입
+        if (null != isPresentAccount(requestDto.getAccount())) {
+            return ResponseDto.fail("DUPLICATED_ACCOUNT",
+                    "중복된 아이디 입니다.");
+        }
+        if (!requestDto.getPassword().equals(requestDto.getPasswordCheck())) {
+            return ResponseDto.fail("PASSWORDS_NOT_MATCHED",
+                    "비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+        }
+
+        Member member = Member.builder()
+                .account(requestDto.getAccount())
+                .password(passwordEncoder.encode(requestDto.getPassword())) //복호화 저장
+                .nickname(requestDto.getNickname())
+                .imageUrl(requestDto.getImageUrl())
+                .build();
+        memberRepository.save(member);
+        return ResponseDto.success("회원가입 성공");
+    }
+
+
+    public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
+        Member member = isPresentAccount(requestDto.getAccount());
+        if (null == member) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "사용자를 찾을 수 없습니다.");
+        }
+
+        if(!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())){
+            return ResponseDto.fail("PASSWORD","비밀번호가 같지 않습니다");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(requestDto.getAccount(), requestDto.getPassword());
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+        tokenToHeaders(tokenDto, response);
+
+
+        return ResponseDto.success(
+                MemberResponseDto.builder()
+                        .account(member.getAccount())
+                        .nickname(member.getNickname())
+                        .build()
+        );
+    }
+
+
+    @Transactional
+    public ResponseDto<?> idCheck(String account) { //아이디 중복체크
+        Optional<Member> optionalMember = memberRepository.findByAccount(account);
+        if (optionalMember.isPresent()) {
+            return ResponseDto.fail("DUPLICATED_ACCOUNT", "중복된 아이디 입니다.");
+        }
+        return ResponseDto.success("가입 가능한 아이디입니다.");
+    }
+
+    @Transactional
+    public ResponseDto<?> nicknameCheck(String nickname) { //닉네임 중복체크
+        Optional<Member> optionalMember = memberRepository.findByNickname(nickname);
+        if (optionalMember.isPresent()) {
+            return ResponseDto.fail("DUPLICATED_NICKNAME", "중복된 닉네임 입니다.");
+        }
+        return ResponseDto.success("가입 가능한 닉네임입니다.");
+    }
+
+    @Transactional(readOnly = true)
+    public Member isPresentAccount(String account) {
+        Optional<Member> optionalMember = memberRepository.findByAccount(account);
+        return optionalMember.orElse(null);
+    }
+    @Transactional
+    public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
+        response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
+        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+        response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
+    }
+
+
+
+    public ResponseDto<?> logout(HttpServletRequest request) {
+        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+            return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
+        }
+        Member member = tokenProvider.getMemberFromAuthentication();
+        if (null == member) {
+            return ResponseDto.fail("MEMBER_NOT_FOUND",
+                    "member not found");
+        }
+
+        return tokenProvider.deleteRefreshToken(member);
+    }
+}

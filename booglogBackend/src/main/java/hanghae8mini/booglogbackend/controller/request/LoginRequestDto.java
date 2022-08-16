@@ -1,4 +1,4 @@
-package hanghae8mini.booglogbackend.controller.responseDto;
+package hanghae8mini.booglogbackend.controller.requestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberResponseDto {
+public class LoginRequestDto {
+
     private String account;
-    private String nickname;
+
+    private String password;
 }

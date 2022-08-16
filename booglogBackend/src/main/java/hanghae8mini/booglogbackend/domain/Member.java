@@ -1,41 +1,46 @@
+
 package hanghae8mini.booglogbackend.domain;
 
+import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
+import hanghae8mini.booglogbackend.domain.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Builder
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 @Entity
-public class Member extends Timestamped{
+public class Member extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
+
     @Column(nullable = false)
     private String account;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
     private String nickname;
-    @Column
+
+    @Column(nullable = true)
     private String imageUrl;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> postList;
-
-    // 테스트용
-    public Member(String nickname) {
-
-        this.account = "test1234";
-        this.nickname = nickname;
-        this.password = "test1234";
-        this.imageUrl = "";
+    public Member(MemberRequestDto requestDto) {
+        this.account = requestDto.getAccount();
+        this.password = requestDto.getPassword();
+        this.nickname = requestDto.getNickname();
+        this.imageUrl = requestDto.getImageUrl();
     }
+
+
+
 }
+
