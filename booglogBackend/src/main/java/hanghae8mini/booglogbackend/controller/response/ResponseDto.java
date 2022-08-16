@@ -1,4 +1,4 @@
-package hanghae8mini.booglogbackend.dto.response;
+package hanghae8mini.booglogbackend.controller.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

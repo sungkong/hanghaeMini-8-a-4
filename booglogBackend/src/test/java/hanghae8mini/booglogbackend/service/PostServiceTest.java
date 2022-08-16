@@ -1,18 +1,10 @@
 package hanghae8mini.booglogbackend.service;
 
-import hanghae8mini.booglogbackend.domain.Post;
-import hanghae8mini.booglogbackend.dto.request.PostRequestDto;
-import hanghae8mini.booglogbackend.dto.response.PostResponseDto;
-import hanghae8mini.booglogbackend.dto.response.ResponseDto;
-import hanghae8mini.booglogbackend.repository.MemberRepository;
-import hanghae8mini.booglogbackend.repository.PostRepository;
+import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
+import hanghae8mini.booglogbackend.controller.response.PostResponseDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -20,7 +12,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

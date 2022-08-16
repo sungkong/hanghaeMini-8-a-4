@@ -1,4 +1,4 @@
-package hanghae8mini.booglogbackend.dto.response;
+package hanghae8mini.booglogbackend.controller.response;
 
 import hanghae8mini.booglogbackend.domain.Category;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Builder
 @Getter
@@ -23,6 +24,7 @@ public class PostResponseDto {
     private String imageUrl;
     private Category category;
     private LocalDateTime createdAt;
+    private List<CommentResponseDto> commentResponseDtoList;
     private int view;
 
     // private List<CommentResponseDto> commentResponseDtoList;

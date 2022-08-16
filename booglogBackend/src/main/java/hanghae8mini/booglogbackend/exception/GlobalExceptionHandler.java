@@ -1,6 +1,6 @@
 package hanghae8mini.booglogbackend.exception;
 
-import hanghae8mini.booglogbackend.dto.response.ResponseDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,10 +1,9 @@
 package hanghae8mini.booglogbackend.controller;
 
-import hanghae8mini.booglogbackend.dto.request.PostRequestDto;
-import hanghae8mini.booglogbackend.dto.response.ResponseDto;
+import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

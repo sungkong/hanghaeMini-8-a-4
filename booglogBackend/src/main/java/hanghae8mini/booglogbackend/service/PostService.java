@@ -1,12 +1,15 @@
 package hanghae8mini.booglogbackend.service;
 
 
+import hanghae8mini.booglogbackend.controller.response.CommentResponseDto;
 import hanghae8mini.booglogbackend.domain.Category;
+import hanghae8mini.booglogbackend.domain.Comment;
 import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.domain.Post;
-import hanghae8mini.booglogbackend.dto.response.PostResponseDto;
-import hanghae8mini.booglogbackend.dto.response.ResponseDto;
-import hanghae8mini.booglogbackend.dto.request.PostRequestDto;
+import hanghae8mini.booglogbackend.controller.response.PostResponseDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
+import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
+import hanghae8mini.booglogbackend.repository.CommentRepository;
 import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.repository.PostCustomRepository;
 import hanghae8mini.booglogbackend.repository.PostRepository;
@@ -14,7 +17,6 @@ import hanghae8mini.booglogbackend.util.CheckMemberUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,8 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final CheckMemberUtil checkMemberUtil;
-    private final PostCustomRepository postCustomRepository;
+    // private final PostCustomRepository postCustomRepository;
+    private final CommentRepository commentRepository;
 
     private final static String VIEWCOOKIENAME = "alreadyViewCookie";
 
@@ -97,6 +99,22 @@ public class PostService {
                     else commentResponseDtoList.add(cdto);
                 }
         );*/
+
+        List<Comment> commentList = commentRepository.findAllByPost(post);  // comment List 데려오기
+        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();  // 최종 보여줄 댓글 꾸러미
+
+        for (Comment comment : commentList) {
+            commentResponseDtoList.add(
+                    CommentResponseDto.builder()
+                            .commentId(comment.getCommentId())
+                            .nickname(comment.getNickname())
+                            .content(comment.getContent())
+                            .createdAt(comment.getCreatedAt())
+                            .modifiedAt(comment.getModifiedAt())
+                            .build()
+            );
+        }
+
         return ResponseDto.success(
                 PostResponseDto.builder()
                         .postId(post.getPostId())
@@ -108,7 +126,7 @@ public class PostService {
                         .content(post.getContent())
                         .imageUrl(post.getImageUrl())
                         .view(post.getView())
-                        //.commentResponseDtoList(commentResponseDtoList)
+                        .commentResponseDtoList(commentResponseDtoList)
                         .createdAt(post.getCreatedAt())
                         .build()
         );
