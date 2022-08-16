@@ -28,7 +28,7 @@ public class Member extends Timestamped {
     @Column(nullable = false)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String imageUrl;
 
     public Member(MemberRequestDto requestDto) {
