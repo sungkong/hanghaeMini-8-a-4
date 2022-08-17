@@ -36,22 +36,21 @@ public class MemberController {
 //        return memberService.signUp(requestDto, multipartFile);
 //    }
 
-    //회원가입 (사진 동시 등록 ver.2)
-    @PostMapping(value = "/signup")
-    public ResponseDto<?> signup(@ModelAttribute @Valid MemberRequestDto requestDto) throws IOException {
-        return memberService.signUp(requestDto);
-    }
-
 //    //회원가입
 //    @PostMapping("/signup") //테스트 ok
 //    public ResponseDto<?> signUp(@RequestBody @Valid MemberRequestDto requestDto) {
 //        return memberService.signUp(requestDto);
 //    }
 
+    //회원가입 (사진 동시 등록 ver.2)
+    @PostMapping(value = "/signup")
+    public ResponseDto<?> signup(@ModelAttribute @Valid MemberRequestDto requestDto) throws IOException {
+        return memberService.signUp(requestDto);
+    }
+
     //로그인
     @PostMapping("/login") //테스트 ok
     public ResponseDto<?> login(@RequestBody LoginRequestDto requestDto, HttpServletResponse response) {
-        System.out.println("1");
         return memberService.login(requestDto, response);
     }
 

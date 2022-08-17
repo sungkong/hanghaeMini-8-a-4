@@ -18,20 +18,20 @@ public class CommentController {
 
     // 댓글 작성
     @RequestMapping(value = "/post/{postId}/comment", method = RequestMethod.POST)
-    public ResponseDto<?> createComment(@RequestBody CommentRequestDto requestDto, HttpServletRequest request) {
-        return commentService.createComment(requestDto, request);
+    public ResponseDto<?> createComment(@PathVariable Long postId, @RequestBody CommentRequestDto requestDto, HttpServletRequest request) {
+        return commentService.createComment(postId, requestDto, request);
     }
 
     // 댓글 수정
     @RequestMapping(value = "/post/{postId}/{commentId}", method = RequestMethod.PUT)
-    public ResponseDto<?> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto requestDto, HttpServletRequest request) {
-        return commentService.updateComment(id, requestDto, request);
+    public ResponseDto<?> updateComment(@PathVariable Long commentId, @RequestBody CommentRequestDto requestDto, HttpServletRequest request) {
+        return commentService.updateComment(commentId, requestDto, request);
     }
 
     // 댓글 삭제
     @RequestMapping(value = "/post/{postId}/{commentId}", method = RequestMethod.DELETE)
-    public ResponseDto<?> deleteComment(@PathVariable Long id, HttpServletRequest request) {
-        return commentService.deleteComment(id, request);
+    public ResponseDto<?> deleteComment(@PathVariable Long commentId, HttpServletRequest request) {
+        return commentService.deleteComment(commentId, request);
     }
 
 }

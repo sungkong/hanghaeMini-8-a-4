@@ -63,6 +63,7 @@ public class PostService {
         }
 
         Category categoryEnum = null;
+
         try{
             categoryEnum = Category.valueOf(requestDto.getCategory());
         } catch(IllegalArgumentException e) {
@@ -84,6 +85,7 @@ public class PostService {
 
 
         Post post = Post.builder()
+                .member(member)
                 .title(requestDto.getTitle())
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
