@@ -49,7 +49,6 @@ public class JwtFilter extends OncePerRequestFilter {
         Key key = Keys.hmacShaKeyFor(keyBytes);
 
         String jwt = resolveToken(request);
-
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Claims claims; //내용
             try {
@@ -81,7 +80,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         filterChain.doFilter(request, response); //
     }
 
