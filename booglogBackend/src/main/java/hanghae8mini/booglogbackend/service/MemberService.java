@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -69,8 +70,7 @@ public class MemberService {
 
     // 회원가입 (사진 동시 등록 버전)
     @Transactional
-    public ResponseDto<?> signUp(MemberRequestDto requestDto) throws IOException { //회원가입
-        System.out.println(requestDto.getAccount());
+    public ResponseDto<?> signUp(@ModelAttribute MemberRequestDto requestDto) throws IOException { //회원가입
 
         if (null != isPresentAccount(requestDto.getAccount())) {
             return ResponseDto.fail("DUPLICATED_ACCOUNT",
