@@ -73,13 +73,21 @@ public class PostService {
     public ResponseDto<?> getPost(Long postId, HttpServletRequest request) {
 
         Member member = checkMemberUtil.validateMember(request);
-        if (null == member) {
-            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+
+        // 게시글 상세조회가 아닌 경우(수정페이지) 로그인 여부 체크하기
+        if(!"/api/post".equals(request.getRequestURI().substring(0,9))){
+            if (null == member) {
+                return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+            }
         }
-        System.out.println("getRequestURI =" + request.getRequestURI());
-        System.out.println("getContextPath() =" + request.getContextPath());
 
         Post post = checkMemberUtil.isPresentPost(postId);
+        if(!"/api/post".equals(request.getRequestURI().substring(0,9))){
+            if(!post.getMember().getMemberId().equals(member.getMemberId())){
+                return ResponseDto.fail("BAD_REQUEST", "작성자만 수정할 수 있습니다.");
+            }
+        }
+
 
         if (null == post) {
             return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
