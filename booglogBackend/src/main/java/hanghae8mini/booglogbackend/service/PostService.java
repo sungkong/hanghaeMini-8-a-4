@@ -1,27 +1,34 @@
 package hanghae8mini.booglogbackend.service;
 
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import hanghae8mini.booglogbackend.annotation.LoginCheck;
+import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
 import hanghae8mini.booglogbackend.controller.response.CommentResponseDto;
+import hanghae8mini.booglogbackend.controller.response.PostResponseDto;
+import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.domain.Category;
 import hanghae8mini.booglogbackend.domain.Comment;
 import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.domain.Post;
-import hanghae8mini.booglogbackend.controller.response.PostResponseDto;
-import hanghae8mini.booglogbackend.controller.response.ResponseDto;
-import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
 import hanghae8mini.booglogbackend.repository.CommentRepository;
 import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.repository.PostCustomRepository;
 import hanghae8mini.booglogbackend.repository.PostRepository;
+import hanghae8mini.booglogbackend.shared.CommonUtils;
 import hanghae8mini.booglogbackend.util.CheckMemberUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,18 +46,21 @@ public class PostService {
     private final PostCustomRepository postCustomRepository;
     private final CommentRepository commentRepository;
 
+    private final AmazonS3Client amazonS3Client;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
     private final static String VIEWCOOKIENAME = "alreadyViewCookie";
 
     @LoginCheck
     @Transactional
-    public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
+    public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) throws IOException {
 
         Member member = checkMemberUtil.validateMember(request);
 
         if (null == member) {
             return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
         }
-
 
         Category categoryEnum = null;
         try{
@@ -59,17 +69,30 @@ public class PostService {
             return ResponseDto.fail("BAD_REQUEST", "카테고리에 없는 항목입니다.");
         }
 
+        String imgUrl = null;
+
+        if (!requestDto.getImageUrl().isEmpty()) {
+            String fileName = CommonUtils.buildFileName(requestDto.getImageUrl().getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(requestDto.getImageUrl().getContentType());
+            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, requestDto.getImageUrl().getInputStream(), objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            imgUrl = amazonS3Client.getUrl(bucketName, fileName).toString();
+            String[] nameWithNoS3info = imgUrl.split(".com/");
+            imgUrl = nameWithNoS3info[1];
+        }
+
+
         Post post = Post.builder()
                 .title(requestDto.getTitle())
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
-                .imageUrl(requestDto.getImageUrl())
-                .member(member)
+                .imageUrl(imgUrl)
                 .category(categoryEnum)
                 .author(requestDto.getAuthor())
                 .build();
         postRepository.save(post);
-        return ResponseDto.success(true, "작성이 완료되었습니다.");
+        return ResponseDto.success(true,"작성이 완료되었습니다.");
     }
 
     // 게시글 상세조회
@@ -207,7 +230,7 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseDto<?> updatePost(Long postId, PostRequestDto requestDto, HttpServletRequest request) {
+    public ResponseDto<?> updatePost(Long postId, PostRequestDto requestDto, HttpServletRequest request) throws IOException{
 
         //member 검증 로직 필요
         // Member member = new Member(requestDto.getNickname());
@@ -226,12 +249,25 @@ public class PostService {
         } catch(IllegalArgumentException e) {
             return ResponseDto.fail("BAD_REQUEST", "카테고리에 없는 항목입니다.");
         }
+
+        String imgUrl = null;
+
+        if (!requestDto.getImageUrl().isEmpty()) {
+            String fileName = CommonUtils.buildFileName(requestDto.getImageUrl().getOriginalFilename());
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentType(requestDto.getImageUrl().getContentType());
+            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, requestDto.getImageUrl().getInputStream(), objectMetadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            imgUrl = amazonS3Client.getUrl(bucketName, fileName).toString();
+            String[] nameWithNoS3info = imgUrl.split(".com/");
+            imgUrl = nameWithNoS3info[1];
+        }
+
         post = Post.builder()
                 .title(requestDto.getTitle())
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
-                .imageUrl(requestDto.getImageUrl())
-                .member(member)
+                .imageUrl(imgUrl)
                 .category(categoryEnum)
                 .author(requestDto.getAuthor())
                 .build();

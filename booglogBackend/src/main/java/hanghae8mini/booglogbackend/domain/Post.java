@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.List;
@@ -48,4 +49,13 @@ public class Post extends Timestamped {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    public Post(Long postId, String title, String bookTitle, String author, String content, String imageUrl, Category category) {
+        this.title = title;
+        this.bookTitle = bookTitle;
+        this.author = author;
+        this.content = content;
+        this.imageUrl = imageUrl;
+        this.category = category;
+    }
 }

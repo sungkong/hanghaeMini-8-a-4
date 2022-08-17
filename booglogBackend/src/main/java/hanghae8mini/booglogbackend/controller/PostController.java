@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @RestController
@@ -17,8 +18,8 @@ public class PostController {
 
     // 생성
     @RequestMapping(value = "/api/auth/post", method = RequestMethod.POST)
-    public ResponseDto<?> createPost(@RequestBody PostRequestDto requestDto,
-                                     HttpServletRequest request) {
+    public ResponseDto<?> createPost(@ModelAttribute PostRequestDto requestDto,
+                                     HttpServletRequest request) throws IOException {
         return postService.createPost(requestDto, request);
     }
     // 게시글 상세조회
@@ -51,8 +52,8 @@ public class PostController {
 
     // 게시글 수정
     @PutMapping(value = "/api/auth/post/{postId}")
-    public ResponseDto<?> updatePost(@PathVariable Long postId ,@RequestBody PostRequestDto requestDto,
-                                     HttpServletRequest request) {
+    public ResponseDto<?> updatePost(@PathVariable Long postId ,@ModelAttribute PostRequestDto requestDto,
+                                     HttpServletRequest request) throws IOException {
         return postService.updatePost(postId, requestDto, request);
     }
 
