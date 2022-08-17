@@ -1,6 +1,8 @@
 package hanghae8mini.booglogbackend.configure;
 
 
+import hanghae8mini.booglogbackend.exception.AccessDeniedHandlerException;
+import hanghae8mini.booglogbackend.exception.AuthenticationEntryPointException;
 import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import hanghae8mini.booglogbackend.utils.Jwt.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +36,8 @@ public class SecurityConfiguration {
     private final TokenProvider tokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
 
-//    private final AuthenticationEntryPointException authenticationEntryPointException;
-//    private final AccessDeniedHandlerException accessDeniedHandlerException;
+    private final AuthenticationEntryPointException authenticationEntryPointException;
+    private final AccessDeniedHandlerException accessDeniedHandlerException;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,19 +55,21 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors();
         http.csrf().disable()
-                //               .exceptionHandling()
-//                .authenticationEntryPoint(authenticationEntryPointException)
-//                .accessDeniedHandler(accessDeniedHandlerException)
+                .exceptionHandling()
+                .authenticationEntryPoint(authenticationEntryPointException)
+                .accessDeniedHandler(accessDeniedHandlerException)
 
-//                .and()
+                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
                 .authorizeRequests()
-                //.antMatchers("/api/user/**").permitAll()
-                .antMatchers("/api/*").permitAll()
-                .antMatchers("/api/**").permitAll()
+                .antMatchers("/api/user/**").permitAll()
+                //.antMatchers("/api/*").permitAll()
+                //.antMatchers("/api/**").permitAll()
+                .antMatchers("/api/post/*").permitAll()
+                .antMatchers("/api/post/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .apply(new JwtSecurityConfiguration(SECRET_KEY, tokenProvider, userDetailsService));
