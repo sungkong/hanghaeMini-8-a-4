@@ -4,15 +4,15 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import hanghae8mini.booglogbackend.controller.request.MemberRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.LoginRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.TokenDto;
 import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.controller.responseDto.MemberResponseDto;
-import hanghae8mini.booglogbackend.shared.CommonUtils;
-import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.repository.MemberRepository;
-import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
+import hanghae8mini.booglogbackend.shared.CommonUtils;
+import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,10 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -70,7 +69,7 @@ public class MemberService {
 
     // 회원가입 (사진 동시 등록 버전)
     @Transactional
-    public ResponseDto<?> signUp(MemberRequestDto requestDto, MultipartFile multipartFile) throws IOException { //회원가입
+    public ResponseDto<?> signUp(MemberRequestDto requestDto) throws IOException { //회원가입
         System.out.println(requestDto.getAccount());
 
         if (null != isPresentAccount(requestDto.getAccount())) {
@@ -84,11 +83,11 @@ public class MemberService {
 
         String imgUrl = null;
 
-        if (!multipartFile.isEmpty()) {
-            String fileName = CommonUtils.buildFileName(multipartFile.getOriginalFilename());
+        if (!requestDto.getImageUrl().isEmpty()) {
+            String fileName = CommonUtils.buildFileName(requestDto.getImageUrl().getOriginalFilename());
             ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(multipartFile.getContentType());
-            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, multipartFile.getInputStream(), objectMetadata)
+            objectMetadata.setContentType(requestDto.getImageUrl().getContentType());
+            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, requestDto.getImageUrl().getInputStream(), objectMetadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead));
             imgUrl = amazonS3Client.getUrl(bucketName, fileName).toString();
             String[] nameWithNoS3info = imgUrl.split(".com/");

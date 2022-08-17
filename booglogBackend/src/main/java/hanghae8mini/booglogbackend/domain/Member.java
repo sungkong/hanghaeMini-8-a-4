@@ -1,7 +1,7 @@
 
 package hanghae8mini.booglogbackend.domain;
 
-import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
+import hanghae8mini.booglogbackend.controller.request.MemberRequestDto;
 import hanghae8mini.booglogbackend.domain.Timestamped;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

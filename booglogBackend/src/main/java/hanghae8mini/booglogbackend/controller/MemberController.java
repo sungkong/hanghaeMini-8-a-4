@@ -1,16 +1,13 @@
 package hanghae8mini.booglogbackend.controller;
 
-import hanghae8mini.booglogbackend.controller.request.PostRequestDto;
+import hanghae8mini.booglogbackend.controller.request.MemberRequestDto;
 import hanghae8mini.booglogbackend.controller.requestDto.LoginRequestDto;
-import hanghae8mini.booglogbackend.controller.requestDto.MemberRequestDto;
-
 import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.service.MemberService;
 import hanghae8mini.booglogbackend.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,8 +21,6 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
-
-
     private final S3Service s3Service;
 
     // 회원가입 & 프로필사진 업로드
@@ -35,10 +30,16 @@ public class MemberController {
 //    }
 
     //회원가입 (사진 동시 등록 버전)
+//    @PostMapping(value = "/signup")
+//    public ResponseDto<?> signup(@RequestPart(value = "dto") @Valid MemberRequestDto requestDto,
+//                                 @RequestPart(required = false, value = "file") MultipartFile multipartFile) throws IOException {
+//        return memberService.signUp(requestDto, multipartFile);
+//    }
+
+    //회원가입 (사진 동시 등록 ver.2)
     @PostMapping(value = "/signup")
-    public ResponseDto<?> signup(@RequestPart(value = "dto") @Valid MemberRequestDto requestDto,
-                                 @RequestPart(required = false, value = "file") MultipartFile multipartFile) throws IOException {
-        return memberService.signUp(requestDto, multipartFile);
+    public ResponseDto<?> signup(@ModelAttribute @Valid MemberRequestDto requestDto) throws IOException {
+        return memberService.signUp(requestDto);
     }
 
 //    //회원가입

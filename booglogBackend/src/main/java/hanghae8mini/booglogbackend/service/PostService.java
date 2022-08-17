@@ -45,11 +45,11 @@ public class PostService {
     @Transactional
     public ResponseDto<?> createPost(PostRequestDto requestDto, HttpServletRequest request) {
 
-//        Member member = checkMemberUtil.validateMember(request);
-//
-//        if (null == member) {
-//            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
-//        }
+        Member member = checkMemberUtil.validateMember(request);
+
+        if (null == member) {
+            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        }
 
 
         Category categoryEnum = null;
@@ -64,7 +64,7 @@ public class PostService {
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
                 .imageUrl(requestDto.getImageUrl())
-//                .member(member)
+                .member(member)
                 .category(categoryEnum)
                 .author(requestDto.getAuthor())
                 .build();
@@ -78,7 +78,7 @@ public class PostService {
 
         // 테스트용
         //Member member = validationMemberById(1l);
-        Member member = validationMemberById(2l);
+//        Member member = validationMemberById(2l);
 
         Post post = checkMemberUtil.isPresentPost(postId);
 

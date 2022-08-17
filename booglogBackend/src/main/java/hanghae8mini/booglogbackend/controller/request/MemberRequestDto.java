@@ -1,9 +1,7 @@
-package hanghae8mini.booglogbackend.controller.requestDto;
+package hanghae8mini.booglogbackend.controller.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
@@ -11,6 +9,7 @@ import javax.validation.constraints.Size;
 
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class MemberRequestDto {
@@ -35,7 +34,7 @@ public class MemberRequestDto {
     @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "영문 대/소 문자 및 숫자만 사용")
     private String passwordCheck;
 
-//    private String imageUrl;
+    private MultipartFile imageUrl;
 
 
 }
