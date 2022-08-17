@@ -124,10 +124,26 @@ public class MemberService {
         tokenToHeaders(tokenDto, response);
 
 
+        Optional<Member> member1 = memberRepository.findByAccount(requestDto.getAccount());
+
+        String imageUrl = member1.get().getImageUrl();
+
+        //기존 방식
+//        return ResponseDto.success(
+//                MemberResponseDto.builder()
+//                        .account(member.getAccount())
+//                        .nickname(member.getNickname())
+//                        .build()
+//        );
+        //바디에 넣어서 보내는 형식
+
         return ResponseDto.success(
                 MemberResponseDto.builder()
                         .account(member.getAccount())
                         .nickname(member.getNickname())
+                        .accessToken(tokenDto.getAccessToken())
+                        .refreshToken(tokenDto.getRefreshToken())
+                        .imageUrl(imageUrl)
                         .build()
         );
     }

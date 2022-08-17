@@ -12,4 +12,8 @@ import lombok.NoArgsConstructor;
 public class MemberResponseDto {
     private String account;
     private String nickname;
+
+    private String accessToken;
+    private String refreshToken;
+    private String imageUrl;
 }
