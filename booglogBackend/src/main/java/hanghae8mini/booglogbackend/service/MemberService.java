@@ -104,7 +104,7 @@ public class MemberService {
         return ResponseDto.success("회원가입 성공");
     }
 
-
+    @Transactional
     public ResponseDto<?> login(LoginRequestDto requestDto, HttpServletResponse response) {
         Member member = isPresentAccount(requestDto.getAccount());
         if (null == member) {
@@ -123,11 +123,25 @@ public class MemberService {
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
         tokenToHeaders(tokenDto, response);
 
+        Optional<Member> member1 = memberRepository.findByAccount(requestDto.getAccount());
 
+        String imageUrl = member1.get().getImageUrl();
+
+        //기존 방식
+//        return ResponseDto.success(
+//                MemberResponseDto.builder()
+//                        .account(member.getAccount())
+//                        .nickname(member.getNickname())
+//                        .build()
+//        );
+        //바디에 넣어서 보내는 형식
         return ResponseDto.success(
                 MemberResponseDto.builder()
                         .account(member.getAccount())
                         .nickname(member.getNickname())
+                        .accessToken(tokenDto.getAccessToken())
+                        .refreshToken(tokenDto.getRefreshToken())
+                        .imageUrl(imageUrl)
                         .build()
         );
     }
@@ -159,14 +173,15 @@ public class MemberService {
     @Transactional
     public void tokenToHeaders(TokenDto tokenDto, HttpServletResponse response) {
         response.addHeader("Authorization", "Bearer " + tokenDto.getAccessToken());
-        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+//        response.addHeader("Refresh-Token", tokenDto.getRefreshToken());
+        response.addHeader("RefreshToken", tokenDto.getRefreshToken());
         response.addHeader("Access-Token-Expire-Time", tokenDto.getAccessTokenExpiresIn().toString());
     }
 
 
 
     public ResponseDto<?> logout(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             return ResponseDto.fail("INVALID_TOKEN", "refresh token is invalid");
         }
         Member member = tokenProvider.getMemberFromAuthentication();
