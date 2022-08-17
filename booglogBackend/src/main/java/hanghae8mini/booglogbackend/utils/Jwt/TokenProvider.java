@@ -4,6 +4,7 @@ package hanghae8mini.booglogbackend.utils.Jwt;
 import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.domain.Member;
 import hanghae8mini.booglogbackend.domain.RefreshToken;
+import hanghae8mini.booglogbackend.repository.MemberRepository;
 import hanghae8mini.booglogbackend.repository.RefreshTokenRepository;
 import hanghae8mini.booglogbackend.controller.requestDto.TokenDto;
 import io.jsonwebtoken.*;
