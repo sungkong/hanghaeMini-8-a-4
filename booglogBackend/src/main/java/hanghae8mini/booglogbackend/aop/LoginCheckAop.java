@@ -29,14 +29,14 @@ public class LoginCheckAop {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .getRequestAttributes()).getRequest();
 
-        if (null == request.getHeader("Refresh-Token") || null == request.getHeader("Authorization")) {
+        if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
                 throw new LoginFailException();
         }
     }
 
     @Transactional
     public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
