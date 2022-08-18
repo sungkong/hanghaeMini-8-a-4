@@ -18,7 +18,9 @@ public class GlobalExceptionHandler {
         return ResponseDto.fail("HttpRequestMethodNotSupportedException" , "등록되지 않는 URI요청입니다.");
     }
 
-
-
+    @ExceptionHandler(LoginFailException.class)
+    public ResponseDto<?> handleLoginFailException() {
+        return ResponseDto.fail("LoginFailException" , "로그인이 필요합니다");
+    }
 
 }

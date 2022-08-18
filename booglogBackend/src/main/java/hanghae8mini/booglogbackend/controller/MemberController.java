@@ -73,12 +73,6 @@ public class MemberController {
         return memberService.logout(request);
     }
 
-//    @GetMapping("/delete")
-//    public String del(){
-//        memberRepository.deleteAll();
-//        return "삭제됨 ㅋ";
-//    }
-
 }
 
 

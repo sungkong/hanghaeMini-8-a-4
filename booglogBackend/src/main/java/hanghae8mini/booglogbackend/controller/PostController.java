@@ -28,20 +28,20 @@ public class PostController {
                                      HttpServletRequest request,
                                      HttpServletResponse response) {
         postService.updateView(postId, request, response); // 조회수 증가
-        return postService.getPost(postId);
+        return postService.getPost(postId, request);
     }
 
     // 수정 페이지 불러오기
-    @GetMapping(value = "/api/updatePostPage/{postId}")
-    public ResponseDto<?> getUpdatePostPage(@PathVariable Long postId) {
-        return postService.getPost(postId);
+    @GetMapping(value = "/api/auth/updatePostPage/{postId}")
+    public ResponseDto<?> getUpdatePostPage(@PathVariable Long postId, HttpServletRequest request) {
+        return postService.getPost(postId, request);
     }
 
 
     // 메인페이지 게시글 조회
     @GetMapping(value = "/api/post/{lastPostId}/{size}")
-    public ResponseDto<?> getAllPost(@PathVariable Long lastPostId, @PathVariable int size) {
-        return postService.getAllPost(lastPostId, size);
+    public ResponseDto<?> getAllPost(@PathVariable Long lastPostId, @PathVariable int size, HttpServletRequest request) {
+        return postService.getAllPost(lastPostId, size, request);
     }
 
     // 내가 작성한 글목록 조회 (보류)
@@ -52,8 +52,8 @@ public class PostController {
 
     // 게시글 수정
     @PutMapping(value = "/api/auth/post/{postId}")
-    public ResponseDto<?> updatePost(@PathVariable Long postId ,@ModelAttribute PostRequestDto requestDto,
-                                     HttpServletRequest request) throws IOException {
+    public ResponseDto<?> updatePost(@PathVariable Long postId , @RequestBody PostRequestDto requestDto,
+                                     HttpServletRequest request) {
         return postService.updatePost(postId, requestDto, request);
     }
 

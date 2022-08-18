@@ -1,6 +1,7 @@
 package hanghae8mini.booglogbackend.service;
 
 
+
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -99,32 +100,31 @@ public class PostService {
 
     // 게시글 상세조회
     @Transactional(readOnly = true)
-    public ResponseDto<?> getPost(Long postId) {
+    public ResponseDto<?> getPost(Long postId, HttpServletRequest request) {
 
         // 테스트용
         //Member member = validationMemberById(1l);
 //        Member member = validationMemberById(2l);
 
+        Member member = checkMemberUtil.validateMember(request);
+
+        // 게시글 상세조회가 아닌 경우(수정페이지) 로그인 여부 체크하기
+        if(!"/api/post".equals(request.getRequestURI().substring(0,9))){
+            if (null == member) {
+                return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+            }
+        }
+
         Post post = checkMemberUtil.isPresentPost(postId);
+        if(!"/api/post".equals(request.getRequestURI().substring(0,9))){
+            if(!post.getMember().getMemberId().equals(member.getMemberId())){
+                return ResponseDto.fail("BAD_REQUEST", "작성자만 수정할 수 있습니다.");
+            }
+        }
 
         if (null == post) {
             return ResponseDto.fail("NOT_FOUND", "존재하지 않는 게시글 id 입니다.");
         }
-/*
-        List<Comment> commentList = commentRepository.findAllByPost(post);
-        List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();
-        Map<Long, CommentResponseDto> map = new HashMap<>();
-
-        commentList.stream().forEach(c -> {
-                    CommentResponseDto cdto = new CommentResponseDto(c);
-                    if(c.getParent() != null){
-                        cdto.setParentId(c.getParent().getId());
-                    }
-                    map.put(cdto.getId(), cdto);
-                    if (c.getParent() != null) map.get(c.getParent().getId()).getChildren().add(cdto);
-                    else commentResponseDtoList.add(cdto);
-                }
-        );*/
 
         List<Comment> commentList = commentRepository.findAllByPost(post);  // comment List 데려오기
         List<CommentResponseDto> commentResponseDtoList = new ArrayList<>();  // 최종 보여줄 댓글 꾸러미
@@ -160,22 +160,14 @@ public class PostService {
 
     // 게시글 메인페이지 목록조회
     @Transactional(readOnly = true)
-    public ResponseDto<?> getAllPost(Long lastPostId, int size) {
+    public ResponseDto<?> getAllPost(Long lastPostId, int size, HttpServletRequest request) {
 
-        // 테스트용
-        //
-        //Member member = validationMemberById(1l);
-        Member member = null;
-
-
+        Member member = checkMemberUtil.validateMember(request);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         List<Post> postList = new ArrayList<>();
         // 비로그인 로직
         if (member == null) {
             List<Post> temp = new ArrayList<>();
-            temp = postRepository.PostAllRandom(size);
-
-
             postList = postRepository.PostAllRandom(size);
         } else { // 로그인 로직
             postList = postRepository.findAllByMemberIdAndCategory(1l, lastPostId, size);
@@ -190,7 +182,6 @@ public class PostService {
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
                 .view(post.getView())
-                //.commentResponseDtoList(commentResponseDtoList)
                 .createdAt(post.getCreatedAt())
                 .build()).collect(Collectors.toList());
 
@@ -199,18 +190,19 @@ public class PostService {
     }
 
     // 작성자의 게시글 리스트
+
     @Transactional(readOnly = true)
+    @LoginCheck
     public ResponseDto<?> getAllPostByMember(HttpServletRequest request) {
 
-        // 테스트용
-        Member member = validationMemberById(1l);
-
+        Member member = checkMemberUtil.validateMember(request);
+        if (null == member) {
+            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        }
         List<Post> postList = postRepository.findAllByMemberMemberId(member.getMemberId());
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
-        // List<PostListResponseDto> postListResponseDtoList = new ArrayList<>();
         for (Post post : postList) {
-            //  int comments = commentRepository.countAllByPost(post);
-            //  int postLikes = postLikeRepository.findAllByPost(post).size();
+
             postResponseDtoList.add(
                     PostResponseDto.builder()
                             .postId(post.getPostId())
@@ -222,7 +214,6 @@ public class PostService {
                             .content(post.getContent())
                             .imageUrl(post.getImageUrl())
                             .view(post.getView())
-                            //.commentResponseDtoList(commentResponseDtoList)
                             .createdAt(post.getCreatedAt())
                             .build()
             );
@@ -232,13 +223,13 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseDto<?> updatePost(Long postId, PostRequestDto requestDto, HttpServletRequest request) throws IOException{
+    @LoginCheck
+    public ResponseDto<?> updatePost(Long postId, PostRequestDto requestDto, HttpServletRequest request) {
 
-        //member 검증 로직 필요
-        // Member member = new Member(requestDto.getNickname());
-
-        // 테스트용
-        Member member = validationMemberById(1l);
+        Member member = checkMemberUtil.validateMember(request);
+        if (null == member) {
+            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        }
         Category categoryEnum = null;
 
         Post post = postRepository.findByPostId(postId);
@@ -252,24 +243,11 @@ public class PostService {
             return ResponseDto.fail("BAD_REQUEST", "카테고리에 없는 항목입니다.");
         }
 
-        String imgUrl = null;
-
-        if (!requestDto.getImageUrl().isEmpty()) {
-            String fileName = CommonUtils.buildFileName(requestDto.getImageUrl().getOriginalFilename());
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentType(requestDto.getImageUrl().getContentType());
-            amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, requestDto.getImageUrl().getInputStream(), objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-            imgUrl = amazonS3Client.getUrl(bucketName, fileName).toString();
-            String[] nameWithNoS3info = imgUrl.split(".com/");
-            imgUrl = nameWithNoS3info[1];
-        }
-
         post = Post.builder()
                 .title(requestDto.getTitle())
                 .bookTitle(requestDto.getBookTitle())
                 .content(requestDto.getContent())
-                .imageUrl(imgUrl)
+                .imageUrl(post.getImageUrl())
                 .category(categoryEnum)
                 .author(requestDto.getAuthor())
                 .build();
@@ -279,10 +257,13 @@ public class PostService {
     }
 
     @Transactional
+    @LoginCheck
     public ResponseDto<?> deletePost(Long postId, HttpServletRequest request) {
 
-        // member 검증 필요
-        Member member = validationMemberById(1l);
+        Member member = checkMemberUtil.validateMember(request);
+        if (null == member) {
+            return ResponseDto.fail("INVALID_TOKEN", "Token이 유효하지 않습니다.");
+        }
         Post post = postRepository.findByPostId(postId);
 
         if(!post.getMember().getMemberId().equals(member.getMemberId())){
@@ -318,15 +299,6 @@ public class PostService {
         return result;
     }
 
-
-
-    // 검증 메소드들
-    private Member validationMemberById(Long id){
-        return memberRepository.findByMemberId(1l).orElse(null);
-    }
-    private Member validationMemberByNickname(String nickname){
-        return memberRepository.findByNickname(nickname).orElse(null);
-    }
 
     /*
     * 조회수 중복 방지를 위한 쿠키 생성 메소드

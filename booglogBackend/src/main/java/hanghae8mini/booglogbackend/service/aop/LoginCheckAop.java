@@ -1,7 +1,11 @@
-package hanghae8mini.booglogbackend.aop;
+package hanghae8mini.booglogbackend.service.aop;
 
 import hanghae8mini.booglogbackend.controller.response.ResponseDto;
 import hanghae8mini.booglogbackend.domain.Member;
+<<<<<<< HEAD
+=======
+import hanghae8mini.booglogbackend.exception.LoginFailException;
+>>>>>>> 40a880c702fb5fb8aa6738f2415e58681f86abdf
 import hanghae8mini.booglogbackend.utils.Jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.annotation.Aspect;
@@ -12,38 +16,28 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Aspect
 @RequiredArgsConstructor
 @Component
 public class LoginCheckAop {
-
     private final TokenProvider tokenProvider;
 
     @Before("@annotation(hanghae8mini.booglogbackend.annotation.LoginCheck)")
-    public ResponseDto<?> loginCheck(){
+    public void loginCheck(){
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
                 .getRequestAttributes()).getRequest();
 
-        String message = "";
-        String code = "";
-        if (null == request.getHeader("Refresh-Token")) {
-            message = "MEMBER_NOT_FOUND";
-            code = "로그인이 필요합니다!.";
+        if (null == request.getHeader("RefreshToken") || null == request.getHeader("Authorization")) {
+                throw new LoginFailException();
         }
-
-        if (null == request.getHeader("Authorization")) {
-            message = "MEMBER_NOT_FOUND";
-            code = "로그인이 필요합니다!.";
-        }
-
-        return ResponseDto.fail(code,message);
     }
 
     @Transactional
     public Member validateMember(HttpServletRequest request) {
-        if (!tokenProvider.validateToken(request.getHeader("Refresh-Token"))) {
+        if (!tokenProvider.validateToken(request.getHeader("RefreshToken"))) {
             return null;
         }
         return tokenProvider.getMemberFromAuthentication();
