@@ -2,6 +2,7 @@ package hanghae8mini.booglogbackend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
+
 import hanghae8mini.booglogbackend.secure.HTMLCharacterEscapes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;

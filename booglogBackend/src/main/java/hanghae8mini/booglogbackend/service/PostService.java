@@ -129,7 +129,6 @@ public class PostService {
     @Transactional(readOnly = true)
     public ResponseDto<?> getAllPost(Long lastPostId, int size, HttpServletRequest request) {
 
-
         Member member = checkMemberUtil.validateMember(request);
         List<PostResponseDto> postResponseDtoList = new ArrayList<>();
         List<Post> postList = new ArrayList<>();
